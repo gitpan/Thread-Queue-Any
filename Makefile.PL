@@ -1,6 +1,6 @@
 require 5.008;
 
-# do we have threads?
+# do we have threads or forks??
 my $module;
 BEGIN {
     $module = "Thread::Queue::Any";
@@ -9,8 +9,15 @@ BEGIN {
     Config->import;
 
     if ( !$Config{useithreads} ) {
-        print "$module requires a version of perl that has threads enabled.\n";
-        exit 0;
+
+        eval { require forks };
+        if ($@) {
+            print <<"TEXT";
+$module requires a version of perl that has threads enabled or
+which has the forks.pm module installed.
+TEXT
+            exit 0;
+        }
     }
 }
 

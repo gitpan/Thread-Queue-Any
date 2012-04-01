@@ -1,5 +1,7 @@
+0.10	1 April 2012
+
 0.09    3 October 2007
-        Hopefully fixed test-suite for none thread enabled Perls.
+        Hopefully fixed test-suite for non-thread enabled Perls.
 
 0.08	3 August 2007
 	Added version markers so that there will be no complaining if

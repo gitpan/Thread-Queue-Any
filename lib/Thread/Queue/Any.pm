@@ -1,63 +1,61 @@
 package Thread::Queue::Any;
 
-# Make sure we inherit from Thread::Queue
-# Make sure we have version info for this module
-# Make sure we do everything by the book from now on
+# initializations
+@ISA=     qw( Thread::Queue );
+$VERSION= '0.10';
 
-@ISA = qw(Thread::Queue);
-$VERSION = '0.09';
+# be as strict as possble
 use strict;
 
-# Make sure we have Storable
-# Make sure we have queues
-
+# modules that we need
 use Storable ();      # no need to pollute namespace
 use Thread::Queue (); # no need to pollute namespace
 
-# Allow for synonym for dequeue_dontwait
+# synonym for dequeue_dontwait
+{
+    no warnings 'once';
+    *dequeue_nb = \&dequeue_dontwait;
+}
 
-*dequeue_nb = \&dequeue_dontwait;
-
-# Satisfy -require-
-
+# satisfy -require-
 1;
 
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #  IN: 1 instantiated object
 #      2..N parameters to be passed as a set onto the queue
 
 sub enqueue {
-    shift->SUPER::enqueue( Storable::freeze( \@_ ) );
-}
+    return shift->SUPER::enqueue( Storable::freeze( \@_ ) );
+} #enqueue
 
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #  IN: 1 instantiated object
 # OUT: 1..N parameters returned from a set on the queue
 
 sub dequeue {
-    @{Storable::thaw( shift->SUPER::dequeue )};
-}
+    return @{ Storable::thaw( shift->SUPER::dequeue ) };
+} #dequeue
 
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #  IN: 1 instantiated object
 # OUT: 1..N parameters returned from a set on the queue
 
 sub dequeue_dontwait {
-    return unless my $ref = shift->SUPER::dequeue_nb;
-    @{Storable::thaw( $ref )};
-}
+    my $ref= shift->SUPER::dequeue_nb or return;
+    return @{ Storable::thaw($ref) };
+} #dequeue_dontwait
 
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #  IN: 1 instantiated object
 # OUT: 1..N parameters returned from a set on the queue
 
 sub dequeue_keep {
 #    return unless my $ref = shift->SUPER::dequeue_keep; # doesn't exist yet
-    return unless my $ref = shift->[0];			# temporary
-    @{Storable::thaw( $ref )};
-}
+    my $ref= shift->[0] or return;                       # temporary
+    return @{ Storable::thaw($ref) };
+} #dequeue_keep
 
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 __END__
 
@@ -68,16 +66,16 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 =head1 SYNOPSIS
 
     use Thread::Queue::Any;
-    my $q = Thread::Queue::Any->new;
+    my $q= Thread::Queue::Any->new;
     $q->enqueue("foo", ["bar"], {"zoo"});
-    my ($foo,$bar,$zoo) = $q->dequeue;
-    my ($foo,$bar,$zoo) = $q->dequeue_dontwait;
-    my ($iffoo,$ifbar,$ifzoo) = $q->dequeue_keep;
-    my $left = $q->pending;
+    my ( $foo, $bar, $zoo )= $q->dequeue;
+    my ( $foo, $bar, $zoo )= $q->dequeue_dontwait;
+    my ( $iffoo, $ifbar, $ifzoo)= $q->dequeue_keep;
+    my $left= $q->pending;
 
 =head1 VERSION
 
-This documentation describes version 0.09.
+This documentation describes version 0.10.
 
 =head1 DESCRIPTION
 
@@ -108,7 +106,7 @@ removing elements from the middle of the list).
 
 =head2 new
 
- $queue = Thread::Queue::Any->new;
+ $queue= Thread::Queue::Any->new;
 
 The C<new> function creates a new empty queue.
 
@@ -116,14 +114,14 @@ The C<new> function creates a new empty queue.
 
 =head2 enqueue LIST
 
- $queue->enqueue( 'string',$scalar,[],{} );
+ $queue->enqueue( 'string', $scalar, [], {} );
 
 The C<enqueue> method adds a reference to all the specified parameters on to
 the end of the queue.  The queue will grow as needed.
 
 =head2 dequeue
 
- ($string,$scalar,$listref,$hashref) = $queue->dequeue;
+ ( $string, $scalar, $listref, $hashref )= $queue->dequeue;
 
 The C<dequeue> method removes a reference from the head of the queue,
 dereferences it and returns the resulting values.  If the queue is currently
@@ -131,7 +129,7 @@ empty, C<dequeue> will block the thread until another thread C<enqueue>s.
 
 =head2 dequeue_dontwait
 
- ($string,$scalar,$listref,$hashref) = $queue->dequeue_dontwait;
+ ( $string, $scalar, $listref, $hashref )= $queue->dequeue_dontwait;
 
 The C<dequeue_dontwait> method, like the C<dequeue> method, removes a
 reference from the head of the queue, dereferences it and returns the
@@ -143,7 +141,7 @@ as a synonym for this method.
 
 =head2 dequeue_keep
 
- ($string,$scalar,$listref,$hashref) = $queue->dequeue_keep;
+ ( $string, $scalar, $listref, $hashref )= $queue->dequeue_keep;
 
 The C<dequeue_keep> method, like the C<dequeue_dontwait> method, takes a
 reference from the head of the queue, dereferences it and returns the
@@ -154,7 +152,7 @@ C<dequeue_dontwait> will have a specific value.
 
 =head2 pending
 
- $pending = $queue->pending;
+ $pending= $queue->pending;
 
 The C<pending> method returns the number of items still in the queue.
 
@@ -179,9 +177,9 @@ Please report bugs to <perlbugs@dijkmat.nl>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002 - 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+Copyright (c) 2002, 2003, 2007, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

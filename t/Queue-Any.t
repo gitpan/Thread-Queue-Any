@@ -9,7 +9,10 @@ use strict;
 use warnings;
 use Test::More tests => 16;
 
-BEGIN { use_ok('threads') }
+BEGIN {
+    eval "use threads; 1" or eval "use forks; 1";
+    diag $@ if !ok( !$@, "threads or forks loaded ok" );
+}
 BEGIN { use_ok('Thread::Queue::Any') }
 
 my $q = Thread::Queue::Any->new;
