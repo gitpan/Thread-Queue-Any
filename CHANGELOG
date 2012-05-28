@@ -1,3 +1,7 @@
+1.01    29 May 2012
+        ARGH. "package name version" still not being understood by PAUSE
+        or MetaCPAN.  Reverting to setting $VERSION explicitely.
+
 1.00    29 May 2012
         Raised version to 1.00, to more easily recognize maintenance versions
         of the module from the more modern version.  Added mention if being
