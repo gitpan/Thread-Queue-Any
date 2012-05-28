@@ -25,9 +25,14 @@ TEXT
 use ExtUtils::MakeMaker;
 use File::Copy qw( cp );
 
+# set version and dependency info in blead only
+eval "use Devel::Required pod => [ qw(
+  lib_xblead/Thread/Queue/Any.pm
+) ]";
+
 # initializations
 my @lib_tree= qw( Thread Thread/Queue );
-my $postfix=  $] < 5.014 ? 'maint' : 'blead';
+my $postfix=  $] < 5.014 ? 'maint' : 'xblead';
 
 # clean up lib
 if ( -d 'lib' ) {
@@ -47,9 +52,6 @@ cp "lib_$postfix/$lib_tree[-1]/$_", "lib/$lib_tree[-1]/$_"
   foreach map { m#(/[^/]+)$# } glob( "lib_$postfix/$lib_tree[-1]/*" );
 cp "t_$postfix/$_", "t/$_"
   foreach map { m#(/[^/]+)$# } glob( "t_$postfix/*" );
-
-# set version and dependency info
-eval "use Devel::Required";
 
 # set up
 WriteMakefile (

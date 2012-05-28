@@ -1,4 +1,4 @@
-package Thread::Queue::Any 0.11;
+package Thread::Queue::Any 0.12;
 
 # initializations
 @ISA= qw( Thread::Queue );
@@ -74,7 +74,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 0.11.
+This documentation describes version 0.12.
 
 =head1 DESCRIPTION
 

@@ -20,4 +20,4 @@ no_index:
 requires:
   Storable: 0
   Thread::Queue: 0
-version: 0.11
+version: 0.12

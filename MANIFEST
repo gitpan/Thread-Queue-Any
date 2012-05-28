@@ -3,9 +3,9 @@ CHANGELOG
 README
 TODO
 Makefile.PL
-lib_blead/Thread/Queue/Any.pm
 lib_maint/Thread/Queue/Any.pm
-t_blead/Queue-Any.t
+lib_xblead/Thread/Queue/Any.pm
 t_maint/Queue-Any.t
+t_xblead/Queue-Any.t
 META.yml                                Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
