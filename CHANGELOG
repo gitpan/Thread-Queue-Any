@@ -1,49 +1,63 @@
-0.10	1 April 2012
+0.11    27 May 2012
+        Added LICENSE setting.
+
+        Introduced the concept of a "maint" and a "blead" version of the code,
+        so that it is possible to start using new Perl features for newer
+        versions of the code.  This means that for versions of perl <5.14,
+        the "maint" version of the code will be installed (0.10), whereas
+        for the perl versions >=5.14, the "blead" version will be installed
+        (0.11).  There are no other differences between the versions yet,
+        this is really just a test to see how PAUSE and (search.|meta)cpan
+        cope with this.
+
+0.10    1 April 2012
+        Some code refactoring and code esthetics.  Fixed problem in test-suite.
+        Verified it runs on 5.14.2.
 
 0.09    3 October 2007
         Hopefully fixed test-suite for non-thread enabled Perls.
 
-0.08	3 August 2007
-	Added version markers so that there will be no complaining if
-	Devel::Required is installed.  Otherwise same as 0.07.
+0.08    3 August 2007
+        Added version markers so that there will be no complaining if
+        Devel::Required is installed.  Otherwise same as 0.07.
 
-0.07	28 December 2003
-	Added automatic required modules update using Devel::Required.
+0.07    28 December 2003
+        Added automatic required modules update using Devel::Required.
 
-0.06	13 August 2003
-	Cleaned up Makefile.PL and updated copyright info.  Made sure the
-	test-suite runs ok with warnings enabled.
+0.06    13 August 2003
+        Cleaned up Makefile.PL and updated copyright info.  Made sure the
+        test-suite runs ok with warnings enabled.
 
-	Removed our and ":unique" attribute as with all of my other Thread::xxx
-	modules.
+        Removed our and ":unique" attribute as with all of my other Thread::xxx
+        modules.
 
-0.05	24 July 2002
-	Made $VERSION and @ISA have the : unique attribute to save memory.
+0.05    24 July 2002
+        Made $VERSION and @ISA have the : unique attribute to save memory.
 
-	Added method "dequeue_keep" plus documentation and test-suite.
+        Added method "dequeue_keep" plus documentation and test-suite.
 
-0.04	21 July 2002
-	Added "can_ok" check to the test-suite.
+0.04    21 July 2002
+        Added "can_ok" check to the test-suite.
 
-	Renamed "dequeue_nb" to "dequeue_dontwait" to be more in line with
-	Thread::Pool.  Added "dequeue_nb" as synonym to remain compatible
-	with Thread::Queue.
+        Renamed "dequeue_nb" to "dequeue_dontwait" to be more in line with
+        Thread::Pool.  Added "dequeue_nb" as synonym to remain compatible
+        with Thread::Queue.
 
-	Fixed several documentation nits.
+        Fixed several documentation nits.
 
-0.03	14 July 2002
-	Added -use threads- to Makefile.PL to cause breakage if attempting
-	to install on a system without threads.
+0.03    14 July 2002
+        Added -use threads- to Makefile.PL to cause breakage if attempting
+        to install on a system without threads.
 
-	Added Perl version requirement to README and pod per suggestion of
-	mrbbking.
+        Added Perl version requirement to README and pod per suggestion of
+        mrbbking.
 
-0.02	13 July 2002
-	Added copyright info to pod.
+0.02    13 July 2002
+        Added copyright info to pod.
 
-	Name change threads::shared:: -> Thread:: caused this module to be
-	renamed to Thread::Queue::Any.  And all the other changes that were
-	necessary.
+        Name change threads::shared:: -> Thread:: caused this module to be
+        renamed to Thread::Queue::Any.  And all the other changes that were
+        necessary.
 
-0.01	10 July 2002
-	First version of threads::shared::queue::any.
+0.01    10 July 2002
+        First version of threads::shared::queue::any.

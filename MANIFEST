@@ -2,9 +2,10 @@ MANIFEST
 CHANGELOG
 README
 TODO
-VERSION
 Makefile.PL
-lib/Thread/Queue/Any.pm
-t/Queue-Any.t
+lib_blead/Thread/Queue/Any.pm
+lib_maint/Thread/Queue/Any.pm
+t_blead/Queue-Any.t
+t_maint/Queue-Any.t
 META.yml                                Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
