@@ -1,7 +1,8 @@
-package Thread::Queue::Any 0.12;
+package Thread::Queue::Any;
 
 # initializations
-@ISA= qw( Thread::Queue );
+@ISA=     qw( Thread::Queue );
+$VERSION= '0.10';
 
 # be as strict as possble
 use strict;
@@ -74,7 +75,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 0.12.
+This documentation describes version 0.10.
 
 =head1 DESCRIPTION
 
@@ -157,7 +158,6 @@ The C<pending> method returns the number of items still in the queue.
 
 =head1 REQUIRED MODULES
 
- Storable (any)
  Thread::Queue (any)
 
 =head1 CAVEATS

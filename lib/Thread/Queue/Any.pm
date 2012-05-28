@@ -1,14 +1,13 @@
-package Thread::Queue::Any;
+require 5.014;
+package Thread::Queue::Any 1.00;
 
 # initializations
-@ISA=     qw( Thread::Queue );
-$VERSION= '0.10';
+@ISA= qw( Thread::Queue );
 
 # be as strict as possble
 use strict;
 
 # modules that we need
-use Storable ();      # no need to pollute namespace
 use Thread::Queue (); # no need to pollute namespace
 
 # synonym for dequeue_dontwait
@@ -16,6 +15,11 @@ use Thread::Queue (); # no need to pollute namespace
     no warnings 'once';
     *dequeue_nb = \&dequeue_dontwait;
 }
+
+# thread local settings
+my $SERIALIZER;
+my $FREEZE;
+my $THAW;
 
 # satisfy -require-
 1;
@@ -25,7 +29,7 @@ use Thread::Queue (); # no need to pollute namespace
 #      2..N parameters to be passed as a set onto the queue
 
 sub enqueue {
-    return shift->SUPER::enqueue( Storable::freeze( \@_ ) );
+    return shift->SUPER::enqueue( $FREEZE->( \@_ ) );
 } #enqueue
 
 #-------------------------------------------------------------------------------
@@ -33,7 +37,7 @@ sub enqueue {
 # OUT: 1..N parameters returned from a set on the queue
 
 sub dequeue {
-    return @{ Storable::thaw( shift->SUPER::dequeue ) };
+    return @{ $THAW->( shift->SUPER::dequeue ) };
 } #dequeue
 
 #-------------------------------------------------------------------------------
@@ -42,7 +46,7 @@ sub dequeue {
 
 sub dequeue_dontwait {
     my $ref= shift->SUPER::dequeue_nb or return;
-    return @{ Storable::thaw($ref) };
+    return @{ $THAW->($ref) };
 } #dequeue_dontwait
 
 #-------------------------------------------------------------------------------
@@ -52,8 +56,105 @@ sub dequeue_dontwait {
 sub dequeue_keep {
 #    return unless my $ref = shift->SUPER::dequeue_keep; # doesn't exist yet
     my $ref= shift->[0] or return;                       # temporary
-    return @{ Storable::thaw($ref) };
+    return @{ $THAW->($ref) };
 } #dequeue_keep
+
+#-------------------------------------------------------------------------------
+#
+# Standard Perl features
+#
+#-------------------------------------------------------------------------------
+# import
+#
+#  IN: 1 class (not used)
+#      2 .. N parameter hash
+
+sub import {
+    my ( undef, %param )= @_;
+    my @errors;
+
+    # parameters we know
+    my $serializer= delete $param{serializer};
+    my $freeze=     delete $param{freeze};
+    my $thaw=       delete $param{thaw};
+
+    # sanity check with serializer class
+    if ($serializer) {
+        push @errors, "Cannot serialize with '$serializer', already specified '$SERIALIZER' before"
+          if $serializer ne $SERIALIZER;
+        push @errors, "Cannot specify 'freeze' code, already specified serializer '$serializer'"
+          if $freeze;
+        push @errors, "Cannot specify 'thaw' code, already specified serializer '$serializer'"
+          if $thaw;
+    }
+
+    # sanity if no serializer, but just freeze / thaw
+    elsif ($freeze) {
+        push @errors, "Cannot specify 'freeze' code, already specified serializer '$SERIALIZER'"
+          if $SERIALIZER;
+        push @errors, "Must also specify 'thaw' if specifying 'freeze'"
+          if !$thaw;
+    }
+
+    # sanity if no serializer or freeze, but with thaw
+    elsif ($thaw) {
+        push @errors, "Cannot specify 'thaw' code, already specified serializer '$SERIALIZER'"
+          if $SERIALIZER;
+    }
+
+    # huh?
+    if ( my @huh= keys %param ) {
+        push @errors, "Don't know what to do with: @huh";
+    }
+    die join "\n", "Found the following errors:", @errors if @errors;
+
+    # found specific serializer
+    if ($serializer) {
+        _set_serializer($serializer);
+    }
+
+    # found separate freeze/thaw subs
+    elsif ($freeze) {
+        $FREEZE= $freeze;
+        $THAW=   $thaw;
+    }
+
+    # use default serializer
+    else {
+        _set_serializer('Storable');
+    }
+} #import
+
+#-------------------------------------------------------------------------------
+#
+# Internal subroutines
+#
+#-------------------------------------------------------------------------------
+# _set_serializer
+#
+#  IN: 1 class
+
+sub _set_serializer {
+    my ($class)= @_;
+
+    # sanity check
+    my @errors;
+    eval "require $class; 1" or push @errors, $@;
+    my $freeze= $class->can( 'freeze' )
+      or push @errors, "$class does not provide a 'freeze' method";
+    my $thaw=   $class->can( 'thaw' )
+      or push @errors, "$class does not provide a 'thaw' method";
+
+    # huh?
+    die join "\n", "Found the following errors:", @errors if @errors;
+
+    # it's all ok
+    $SERIALIZER= $class;
+    $FREEZE=     $freeze;
+    $THAW=       $thaw;
+
+    return;
+} #_set_serializer
 
 #-------------------------------------------------------------------------------
 
@@ -73,18 +174,22 @@ Thread::Queue::Any - thread-safe queues for any data-structure
     my ( $iffoo, $ifbar, $ifzoo)= $q->dequeue_keep;
     my $left= $q->pending;
 
+    # specify class with "freeze" and "thaw" methods
+    use Thread::Queue::Any serializer => 'Storable';
+
+    # specify custom freeze and thaw subroutines
+    use Thread::Queue::Any freeze => \&solid, thaw => \&liquid;
+
 =head1 VERSION
 
-This documentation describes version 0.10.
+This documentation describes version 1.00.
 
 =head1 DESCRIPTION
 
                     *** A note of CAUTION ***
 
- This module only functions on Perl versions 5.8.0-RC3 and later.
- And then only when threads are enabled with -Dusethreads.  It is
- of no use with any version of Perl before 5.8.0-RC3 or without
- threads enabled.
+ This module only functions if threading has been enabled when building
+ Perl, or if the L<forks> module has been installed on an unthreaded Perl.
 
                     *************************
 
@@ -99,8 +204,7 @@ the parameters that were enqueued together, this module is a drop-in
 replacement for C<Thread::Queue> in every other aspect.
 
 Any number of threads can safely add elements to the end of the list, or
-remove elements from the head of the list. (Queues don't permit adding or
-removing elements from the middle of the list).
+remove elements from the head of the list.
 
 =head1 CLASS METHODS
 
@@ -156,18 +260,39 @@ C<dequeue_dontwait> will have a specific value.
 
 The C<pending> method returns the number of items still in the queue.
 
-=head1 REQUIRED MODULES
-
- Storable (any)
- Thread::Queue (any)
-
-=head1 CAVEATS
+=head1 USING ANOTHER SERIALIZER
 
 Passing unshared values between threads is accomplished by serializing the
-specified values using C<Storable> when enqueuing and de-serializing the queued
-value on dequeuing.  This allows for great flexibility at the expense of more
+specified values when enqueuing and de-serializing the queued value on
+equeuing.  This allows for great flexibility at the expense of more
 CPU usage.  It also limits what can be passed, as e.g. code references can
-B<not> be serialized and therefore not be passed.
+B<not> be serialized with the default serializer and therefore not be passed.
+
+By default, the L<Storable> module is used to serialize data.  If you want to
+use a different serializer, you can specify this when you load this module
+with the C<serializer> parameter:
+
+ use Thread::Queue::Any serializer => 'Thread::Serialize';
+
+The value of the parameter is the name of the class that will provide a
+C<freeze> and C<thaw> subroutine.  It will be automatically loaded if
+specified.
+
+If you happen to have subroutines in another module with a different name,
+you can also specify the C<freeze> and C<thaw> parameter with a code reference
+of the subroutine to be called.  So the above example could also be specified
+as:
+
+ use Thread::Serialize;
+ use Thread::Queue::Any
+   freeze => \&Thread::Serialize::freeze,
+   thaw   => \&Thread::Serialize::thaw,
+ ;
+
+=head1 REQUIRED MODULES
+
+ Test::More (0.88)
+ Thread::Queue (any)
 
 =head1 AUTHOR
 

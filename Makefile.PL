@@ -23,35 +23,81 @@ TEXT
 
 # set up stuff
 use ExtUtils::MakeMaker;
-use File::Copy qw( cp );
+use File::Copy qw( mv );
 
-# set version and dependency info in blead only
-eval "use Devel::Required pod => [ qw(
-  lib_xblead/Thread/Queue/Any.pm
-) ]";
+# set version and dependency info
+eval "use Devel::Required";
 
 # initializations
-my @lib_tree= qw( Thread Thread/Queue );
-my $postfix=  $] < 5.014 ? 'maint' : 'xblead';
+my $lib_tree= 'Thread/Queue';
+my @postfix=  qw( blead maint );
+my $maint=    ( $] < 5.014 ) || 0;
 
-# clean up lib
-if ( -d 'lib' ) {
-    unlink glob( "lib/$lib_tree[-1]/*" );
-    unlink glob( 't/*' );
+# do we have an override?
+if (@ARGV) {
+    my ($type)= @ARGV;
+    if ( $type eq 'maint' ) {
+        $maint= 1;
+    }
+
+    elsif ( $type eq 'blead' ) {
+        $maint= 0;
+    }
+
+    else {
+        die "Don't understand '$type' to force version to test / install";
+    }
+
+    print STDERR "Forcing to use the '$type' version of the code\n";
 }
 
-# make new lib
+# create shortcuts
+my $this= $postfix[$maint];
+my $that= $postfix[ !$maint ];
+
+# make sure empty directories exist, 'make dist' doesn't include them
+mkdir 'lib_blead';
+mkdir 'lib_blead/Thread';
+mkdir 'lib_blead/Thread/Queue';
+mkdir 't_blead';
+
+# need to move files into place
+if ( my @files= glob( "lib_$this/$lib_tree/*" ) ) {
+    print STDERR "Moving $this files into position\n";
+
+    # move current files away
+    mv "lib/$lib_tree/$_", "lib_$that/$lib_tree/${_}_$that"
+      foreach
+        map { m#/([^/\.]+\.pm)$# }
+        glob( "lib/$lib_tree/*" );
+    mv "t/$_", "t_$that/${_}_$that"
+      foreach
+        map { m#/([^/\.]+\.t)$# }
+        glob( "t/*" );
+
+    # put files into place
+    mv "lib_$this/$lib_tree/${_}_$this", "lib/$lib_tree/$_"
+      foreach
+        map { m#/([^/\.]+\.pm)_$this$# }
+        @files;
+    mv "t_$this/${_}_$this", "t/$_"
+      foreach
+        map { m#/([^/]+\.t)_$this$# }
+        glob( "t_$this/*" );
+}
+
+# right files already there
 else {
-    mkdir "lib";
-    mkdir "lib/$_" foreach @lib_tree;
-    mkdir "t";
+    print STDERR "Files for $this already in position\n";
 }
 
-# put files into place
-cp "lib_$postfix/$lib_tree[-1]/$_", "lib/$lib_tree[-1]/$_"
-  foreach map { m#(/[^/]+)$# } glob( "lib_$postfix/$lib_tree[-1]/*" );
-cp "t_$postfix/$_", "t/$_"
-  foreach map { m#(/[^/]+)$# } glob( "t_$postfix/*" );
+# set up prerequisites
+my @prereq_pm= (
+  'Thread::Queue' => 0,
+);
+push @prereq_pm, (
+  'Test::More'    => 0.88,
+) if !$maint;
 
 # set up
 WriteMakefile (
@@ -60,11 +106,6 @@ WriteMakefile (
  ABSTRACT     => 'thread-safe queues for any data-structure',
  VERSION_FROM => 'lib/Thread/Queue/Any.pm',
  LICENSE      => 'perl',
-
- PREREQ_PM    => {
-                    'Thread::Queue' => 0,
-                    'Storable' => 0,
-                   },
-
+ PREREQ_PM    => { @prereq_pm },
  clean        => { FILES => 'lib t' },
 );

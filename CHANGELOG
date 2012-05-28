@@ -1,5 +1,25 @@
+1.00    29 May 2012
+        Raised version to 1.00, to more easily recognize maintenance versions
+        of the module from the more modern version.  Added mention if being
+        the maint version in the source of the maint version.  The maint
+        version should now be considered to be frozen, except for serious
+        bug fixes.
+
+        Added code version parameter to Makefile.PL and documented this in
+        the README file.
+
+        Changed tests as suggested by Michael Schwern in RT #76810.
+
+        Added support for other serializer, such as suggested in RT #58250.
+        Sorry it had to take this long!  No tests yet, but the documentation
+        is at least there already.
+
 0.12    28 May 2012
-        It appears
+        It appears that PAUSE is indexing the last file it finds when trying
+        to determine what to index.  So I renamed the "lib_blead" directory
+        to "lib_xblead" so that it will sort after "lib_maint".  This should
+        cause PAUSE to index the blead version of the code, rather than the
+        maint version.
 
 0.11    27 May 2012
         Added LICENSE setting.

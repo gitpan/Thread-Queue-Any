@@ -7,17 +7,23 @@ BEGIN {				# Magic Perl CORE pragma
 
 use strict;
 use warnings;
-use Test::More tests => 16;
 
+my %Loaded;
 BEGIN {
-    eval "use threads; 1" or eval "use forks; 1";
-    diag $@ if !ok( !$@, "threads or forks loaded ok" );
+    $Loaded{threads}= eval "use threads; 1";
+    $Loaded{forks}=   eval "use forks; 1" if !$Loaded{threads};
 }
-BEGIN { use_ok('Thread::Queue::Any') }
 
-my $q = Thread::Queue::Any->new;
+use Thread::Queue::Any;
+use Test::More;
+
+diag "threads loaded" if $Loaded{threads};
+diag "forks loaded"   if $Loaded{forks};
+ok( $Loaded{threads} || $Loaded{forks}, "thread-like module loaded" );
+
+my $q= Thread::Queue::Any->new;
 isa_ok( $q, 'Thread::Queue::Any', 'check object type' );
-can_ok( $q,qw(
+can_ok( $q, qw(
  dequeue
  dequeue_dontwait
  dequeue_keep
@@ -27,17 +33,17 @@ can_ok( $q,qw(
  pending
 ) );
 
-$q->enqueue( qw(a b c) );
-$q->enqueue( [qw(a b c)] );
-$q->enqueue( {a => 1, b => 2, c => 3} );
+$q->enqueue( qw( a b c ) );
+$q->enqueue( [ qw( a b c ) ] );
+$q->enqueue( { a => 1, b => 2, c => 3 } );
 
 is( $q->pending, 3,			'check number pending');
 
-my @l = $q->dequeue;
+my @l= $q->dequeue;
 is( @l, 3,				'check # elements simple list' );
 ok( ($l[0] eq 'a' and $l[1] eq 'b' and $l[2] eq 'c'), 'check simple list' );
 
-my @lr = $q->dequeue_nb;
+my @lr= $q->dequeue_nb;
 cmp_ok( @lr, '==', 1,			'check # elements list ref' );
 is( ref($lr[0]), 'ARRAY',		'check type of list ref' );
 ok(
@@ -45,11 +51,11 @@ ok(
  'check list ref'
 );
 
-my @hr = $q->dequeue_keep;
+my @hr= $q->dequeue_keep;
 cmp_ok( @hr, '==', 1,			'check # elements hash ref, #1' );
 is( ref($hr[0]), 'HASH',		'check type of hash ref, #1' );
 
-@hr = $q->dequeue;
+@hr= $q->dequeue;
 cmp_ok( @hr, '==', 1,			'check # elements hash ref, #2' );
 is( ref($hr[0]), 'HASH',		'check type of hash ref, #2' );
 ok(
@@ -57,5 +63,7 @@ ok(
  'check hash ref'
 );
 
-my @e = $q->dequeue_dontwait;
+my @e= $q->dequeue_dontwait;
 cmp_ok( @e, '==', 0,			'check # elements non blocking' );
+
+done_testing(15);
