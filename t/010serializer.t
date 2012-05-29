@@ -36,32 +36,28 @@ $q->enqueue( { a => 1, b => 2, c => 3 } );
 is( $q->pending, 3,              'check number pending');
 
 # dequeueing
-my @l= $q->dequeue;
-is( @l, 3,                'check # elements simple list' );
-ok( ($l[0] eq 'a' and $l[1] eq 'b' and $l[2] eq 'c'), 'check simple list' );
+my $l= $q->dequeue;
+is( $l, 'a',                     'check simple list in scalar context' );
 
-my @lr= $q->dequeue_nb;
-cmp_ok( @lr, '==', 1,            'check # elements list ref' );
-is( ref($lr[0]), 'ARRAY',        'check type of list ref' );
+my $lr= $q->dequeue_nb;
+is( ref($lr), 'ARRAY',           'check type of list ref' );
 ok(
- ($lr[0]->[0] eq 'a' and $lr[0]->[1] eq 'b' and $lr[0]->[2] eq 'c'),
+ ($lr->[0] eq 'a' and $lr->[1] eq 'b' and $lr->[2] eq 'c'),
  'check list ref'
 );
 
-my @hr= $q->dequeue_keep;
-cmp_ok( @hr, '==', 1,            'check # elements hash ref, #1' );
-is( ref($hr[0]), 'HASH',         'check type of hash ref, #1' );
+my $hr= $q->dequeue_keep;
+is( ref($hr), 'HASH',            'check type of hash ref, #1' );
 
-@hr= $q->dequeue;
-cmp_ok( @hr, '==', 1,            'check # elements hash ref, #2' );
-is( ref($hr[0]), 'HASH',         'check type of hash ref, #2' );
+$hr= $q->dequeue;
+is( ref($hr), 'HASH',            'check type of hash ref, #2' );
 ok(
- ($hr[0]->{a} == 1 and $hr[0]->{b} == 2 and $hr[0]->{c} == 3),
+ ($hr->{a} == 1 and $hr->{b} == 2 and $hr->{c} == 3),
  'check hash ref'
 );
 
-my @e= $q->dequeue_dontwait;
-cmp_ok( @e, '==', 0,             'check # elements non blocking' );
+my $e= $q->dequeue_dontwait;
+ok( !defined($e),                'check empty' );
 
 # serializer
 ok( !eval "use $class serializer => 'FrobNob'; 1", "different serializer" );
@@ -71,4 +67,4 @@ like( $@, qr#Cannot specify new 'freeze', already using freeze/thaw# );
 ok( !eval "use $class thaw => sub {}; 1", "specific thaw" );
 like( $@, qr#Cannot specify new 'thaw', already using freeze/thaw# );
 
-done_testing(20);
+done_testing(16);

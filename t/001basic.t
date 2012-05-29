@@ -42,7 +42,7 @@ is( $q->pending, 3,              'check number pending');
 
 # dequeueing
 my @l= $q->dequeue;
-is( @l, 3,                'check # elements simple list' );
+is( @l, 3,                       'check # elements simple list' );
 ok( ($l[0] eq 'a' and $l[1] eq 'b' and $l[2] eq 'c'), 'check simple list' );
 
 my @lr= $q->dequeue_nb;
@@ -56,6 +56,10 @@ ok(
 my @hr= $q->dequeue_keep;
 cmp_ok( @hr, '==', 1,            'check # elements hash ref, #1' );
 is( ref($hr[0]), 'HASH',         'check type of hash ref, #1' );
+ok(
+ ($hr[0]->{a} == 1 and $hr[0]->{b} == 2 and $hr[0]->{c} == 3),
+ 'check hash ref'
+);
 
 @hr= $q->dequeue;
 cmp_ok( @hr, '==', 1,            'check # elements hash ref, #2' );
@@ -79,4 +83,4 @@ like( $@, qr#Cannot specify 'thaw', already using serializer 'Storable'# );
 ok( !eval "use $class frobnob => 1; 1", "unknown specification" );
 like( $@, qr#Don't know what to do with: frobnob# );
 
-done_testing(24);
+done_testing(25);

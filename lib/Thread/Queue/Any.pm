@@ -1,10 +1,10 @@
 require 5.014;
-#package Thread::Queue::Any 1.02; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any 1.03; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Queue::Any;       # please remove if no longer needed
 
 # initializations
 @ISA= qw( Thread::Queue );
-$VERSION= 1.02;                   # please remove if no longer needed
+$VERSION= 1.03;                   # please remove if no longer needed
 
 # be as strict as possble
 use strict;
@@ -39,7 +39,9 @@ sub enqueue {
 # OUT: 1..N parameters returned from a set on the queue
 
 sub dequeue {
-    return @{ $THAW->( shift->SUPER::dequeue ) };
+    return wantarray
+      ? @{ $THAW->( shift->SUPER::dequeue ) }
+      : $THAW->( shift->SUPER::dequeue )->[0];
 } #dequeue
 
 #-------------------------------------------------------------------------------
@@ -48,7 +50,9 @@ sub dequeue {
 
 sub dequeue_dontwait {
     my $ref= shift->SUPER::dequeue_nb or return;
-    return @{ $THAW->($ref) };
+    return wantarray
+      ? @{ $THAW->($ref) }
+      : $THAW->($ref)->[0];
 } #dequeue_dontwait
 
 #-------------------------------------------------------------------------------
@@ -56,9 +60,14 @@ sub dequeue_dontwait {
 # OUT: 1..N parameters returned from a set on the queue
 
 sub dequeue_keep {
-#    return unless my $ref = shift->SUPER::dequeue_keep; # doesn't exist yet
-    my $ref= shift->[0] or return;                       # temporary
-    return @{ $THAW->($ref) };
+
+    # make sure we're the only one
+    lock( @{ $_[0] } );
+
+    my $ref= shift->[0] or return;
+    return wantarray
+      ? @{ $THAW->($ref) }
+      : $THAW->($ref)->[0];
 } #dequeue_keep
 
 #-------------------------------------------------------------------------------
@@ -66,8 +75,6 @@ sub dequeue_keep {
 # Standard Perl features
 #
 #-------------------------------------------------------------------------------
-# import
-#
 #  IN: 1 class (not used)
 #      2 .. N parameter hash
 
@@ -190,7 +197,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.02.
+This documentation describes version 1.03.
 
 =head1 DESCRIPTION
 
@@ -235,13 +242,20 @@ the end of the queue.  The queue will grow as needed.
 
  ( $string, $scalar, $listref, $hashref )= $queue->dequeue;
 
+ $string= $queue->dequeue;          # first only in scalar context
+
 The C<dequeue> method removes a reference from the head of the queue,
 dereferences it and returns the resulting values.  If the queue is currently
 empty, C<dequeue> will block the thread until another thread C<enqueue>s.
 
+If called in scalar context, only the first value will be returned.  This is
+only recommended if L<enqueue> is always only called with one parameter.
+
 =head2 dequeue_dontwait
 
  ( $string, $scalar, $listref, $hashref )= $queue->dequeue_dontwait;
+
+ $string= $queue->dequeue_dontwait; # first only in scalar context
 
 The C<dequeue_dontwait> method, like the C<dequeue> method, removes a
 reference from the head of the queue, dereferences it and returns the
@@ -251,9 +265,14 @@ if the queue is empty, instead returning an empty list if the queue is empty.
 For compatibility with L<Thread::Queue>, the name "dequeue_nb" is available
 as a synonym for this method.
 
+If called in scalar context, only the first value will be returned.  This is
+only recommended if L<enqueue> is always only called with one parameter.
+
 =head2 dequeue_keep
 
  ( $string, $scalar, $listref, $hashref )= $queue->dequeue_keep;
+
+ $string= $queue->dequeue_keep;     # first only in scalar context
 
 The C<dequeue_keep> method, like the C<dequeue_dontwait> method, takes a
 reference from the head of the queue, dereferences it and returns the
@@ -261,6 +280,9 @@ resulting values.  Unlike C<dequeue_dontwait>, though, the C<dequeue_keep>
 B<won't remove> the set from the queue.  It can therefore be used to test if
 the next set to be returned from the queue with C<dequeue> or
 C<dequeue_dontwait> will have a specific value.
+
+If called in scalar context, only the first value will be returned.  This is
+only recommended if L<enqueue> is always only called with one parameter.
 
 =head2 pending
 

@@ -1,3 +1,15 @@
+1.03    29 May 2012
+        Apparently I lost the pod explaining that the maint version of the
+        code is the maint version.  Added again.  For some reason, both
+        versions of the code show up on search.cpan.org.  Then it is good
+        to show that that documentation does not describe the real thing
+        (anymore).
+
+        The "dequeue*" methods now return the first element of the values in
+        scalar context.  This should simplify the most often used use case,
+        where only one value is passed to "enqueue".  As suggested in
+        RT #74560.
+
 1.02    29 May 2012
         ARGH DOUBLE ARGH.  MetaCPAN appears to dislike the new -package-
         format so much still, that the occurrence of it, will put the whole
