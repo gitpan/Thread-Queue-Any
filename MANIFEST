@@ -5,7 +5,8 @@ TODO
 Makefile.PL
 lib/Thread/Queue/Any.pm
 lib_maint/Thread/Queue/Any.pm_maint
-t/Queue-Any.t
+t/001basic.t
+t/010serializer.t
 t_maint/Queue-Any.t_maint
 META.yml                                Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

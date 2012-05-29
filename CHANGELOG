@@ -1,3 +1,13 @@
+1.02    29 May 2012
+        ARGH DOUBLE ARGH.  MetaCPAN appears to dislike the new -package-
+        format so much still, that the occurrence of it, will put the whole
+        distribution into a black hole.  Sigh.
+
+        Also: from a previous way that I implemented multiple versions of
+        the code, a "make distclean" would clean up too much.  Now fixed.
+
+        Added serializer tests.
+
 1.01    29 May 2012
         ARGH. "package name version" still not being understood by PAUSE
         or MetaCPAN.  Reverting to setting $VERSION explicitely.

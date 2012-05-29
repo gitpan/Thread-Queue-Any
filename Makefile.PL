@@ -84,6 +84,9 @@ if ( my @files= glob( "lib_$this/$lib_tree/*" ) ) {
       foreach
         map { m#/([^/]+\.t)_$this$# }
         glob( "t_$this/*" );
+
+    # make sure we will copy to blib
+    unlink "blib/lib/$lib_tree/Any.pm";
 }
 
 # right files already there
@@ -107,5 +110,4 @@ WriteMakefile (
  VERSION_FROM => 'lib/Thread/Queue/Any.pm',
  LICENSE      => 'perl',
  PREREQ_PM    => { @prereq_pm },
- clean        => { FILES => 'lib t' },
 );

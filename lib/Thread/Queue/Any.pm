@@ -1,10 +1,10 @@
 require 5.014;
-package Thread::Queue::Any 1.01; # not supported by PAUSE or MetaCPAN :-(
-package Thread::Queue::Any;      # please remove if no longer needed
+#package Thread::Queue::Any 1.02; # not supported by PAUSE or MetaCPAN :-(
+package Thread::Queue::Any;       # please remove if no longer needed
 
 # initializations
 @ISA= qw( Thread::Queue );
-$VERSION= 1.01;                  # please remove if no longer needed
+$VERSION= 1.02;                   # please remove if no longer needed
 
 # be as strict as possble
 use strict;
@@ -82,26 +82,32 @@ sub import {
 
     # sanity check with serializer class
     if ($serializer) {
-        push @errors, "Cannot serialize with '$serializer', already specified '$SERIALIZER' before"
-          if $serializer ne $SERIALIZER;
-        push @errors, "Cannot specify 'freeze' code, already specified serializer '$serializer'"
+        push @errors, "Cannot serialize with '$serializer', already using '$SERIALIZER'"
+          if $SERIALIZER and $serializer ne $SERIALIZER;
+        push @errors, "Cannot serialize with '$serializer', already using freeze/thaw"
+          if !$SERIALIZER;
+        push @errors, "Cannot specify 'freeze', already using serializer '$serializer'"
           if $freeze;
-        push @errors, "Cannot specify 'thaw' code, already specified serializer '$serializer'"
+        push @errors, "Cannot specify 'thaw', already using serializer '$serializer'"
           if $thaw;
     }
 
     # sanity if no serializer, but just freeze / thaw
     elsif ($freeze) {
-        push @errors, "Cannot specify 'freeze' code, already specified serializer '$SERIALIZER'"
+        push @errors, "Cannot specify 'freeze', already using serializer '$SERIALIZER'"
           if $SERIALIZER;
+        push @errors, "Cannot specify new 'freeze', already using freeze/thaw"
+          if !$SERIALIZER and $FREEZE;
         push @errors, "Must also specify 'thaw' if specifying 'freeze'"
           if !$thaw;
     }
 
     # sanity if no serializer or freeze, but with thaw
     elsif ($thaw) {
-        push @errors, "Cannot specify 'thaw' code, already specified serializer '$SERIALIZER'"
+        push @errors, "Cannot specify 'thaw', already using serializer '$SERIALIZER'"
           if $SERIALIZER;
+        push @errors, "Cannot specify new 'thaw', already using freeze/thaw"
+          if !$SERIALIZER and $THAW;
     }
 
     # huh?
@@ -184,14 +190,14 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.01.
+This documentation describes version 1.02.
 
 =head1 DESCRIPTION
 
                     *** A note of CAUTION ***
 
  This module only functions if threading has been enabled when building
- Perl, or if the L<forks> module has been installed on an unthreaded Perl.
+ Perl, or if the "forks" module has been installed on an unthreaded Perl.
 
                     *************************
 
