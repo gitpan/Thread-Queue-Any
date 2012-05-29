@@ -1,3 +1,15 @@
+1.04    29 May 2012
+        It appears that Devel::Required was deleting the extra text with the
+        version information.  Instead I now changed the "A note of caution"
+        message.
+
+        Moved the moving files into position code until *after* the Makefile
+        has been written.  This should take care of missing files from MANIFEST
+        warnings when calling perl Makefile.PL for the "maint" version for
+        the first time.  Apparently the MANIFEST check is only done the very
+        first time Makefile.PL is being run.  Which is a good thing.  Raised
+        the maint version to 0.13.
+
 1.03    29 May 2012
         Apparently I lost the pod explaining that the maint version of the
         code is the maint version.  Added again.  For some reason, both

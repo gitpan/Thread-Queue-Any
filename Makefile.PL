@@ -55,6 +55,24 @@ if (@ARGV) {
 my $this= $postfix[$maint];
 my $that= $postfix[ !$maint ];
 
+# set up prerequisites
+my @prereq_pm= (
+  'Thread::Queue' => 0,
+);
+push @prereq_pm, (
+  'Test::More'    => 0.88,
+) if !$maint;
+
+# set up
+WriteMakefile (
+ NAME         => $module,
+ AUTHOR       => 'Elizabeth Mattijsen (liz@dijkmat.nl)',
+ ABSTRACT     => 'thread-safe queues for any data-structure',
+ VERSION_FROM => 'lib/Thread/Queue/Any.pm',
+ LICENSE      => 'perl',
+ PREREQ_PM    => { @prereq_pm },
+);
+
 # make sure empty directories exist, 'make dist' doesn't include them
 mkdir 'lib_blead';
 mkdir 'lib_blead/Thread';
@@ -86,28 +104,10 @@ if ( my @files= glob( "lib_$this/$lib_tree/*" ) ) {
         glob( "t_$this/*" );
 
     # make sure we will copy to blib
-    unlink "blib/lib/$lib_tree/Any.pm";
+    unlink glob( "blib/lib/$lib_tree/*" );
 }
 
 # right files already there
 else {
     print STDERR "Files for $this already in position\n";
 }
-
-# set up prerequisites
-my @prereq_pm= (
-  'Thread::Queue' => 0,
-);
-push @prereq_pm, (
-  'Test::More'    => 0.88,
-) if !$maint;
-
-# set up
-WriteMakefile (
- NAME         => $module,
- AUTHOR       => 'Elizabeth Mattijsen (liz@dijkmat.nl)',
- ABSTRACT     => 'thread-safe queues for any data-structure',
- VERSION_FROM => 'lib/Thread/Queue/Any.pm',
- LICENSE      => 'perl',
- PREREQ_PM    => { @prereq_pm },
-);
