@@ -160,7 +160,6 @@ The C<pending> method returns the number of items still in the queue.
 
 =head1 REQUIRED MODULES
 
- Test::More (0.88)
  Thread::Queue (any)
 
 =head1 CAVEATS

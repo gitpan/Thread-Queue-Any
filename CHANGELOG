@@ -1,3 +1,20 @@
+1.05    30 May 2012
+        After on/offlist discussion on p5p, I decided to not have automatic
+        state selection logic.  Instead, it will by default try to install
+        the "blead" version of the code and fail with an extensive message
+        if the version of Perl is not sufficient.  This should ensure "normal"
+        behavior as a distribution with a Perl version restriction, while at
+        the same time allow packagers to install / package the "maint" version
+        without too much trouble.
+
+        Reverted the order in which files were moved into place.  This was
+        done to prevent warnings about missing files when doing a running
+        of perl Makefile.PL maint from scratch.  The better solution is just
+        to have a MANIFEST_maint file as well, and move that into place before
+        ExtUtils::MakeMaker does its manifest check.
+
+        There are no functional differences in the code otherwise.
+
 1.04    29 May 2012
         It appears that Devel::Required was deleting the extra text with the
         version information.  Instead I now changed the "A note of caution"

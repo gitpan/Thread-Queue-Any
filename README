@@ -15,31 +15,34 @@ All rights reserved.  This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 Version:
- 1.04
+ 1.05
 
 Required Modules:
  Test::More (0.88)
  Thread::Queue (any)
 
+Installation:
 This distribution contains two versions of the code: one maintenance version
-for versions of perl < 5.14 (known as 'maint'), and the version currently in
+for versions of perl < 5.014 (known as 'maint'), and the version currently in
 development (known as 'blead').  The standard build for your perl version is:
 
-perl Makefile.PL
-make
-make test
-make install
+ perl Makefile.PL
+ make
+ make test
+ make install
 
-This will test and install the appropriate version of the code for the given
-perl executable.  Should you wish to try to use the other version of the
-code in a version of Perl that is currently not supported, you can specify
-the version of the code to be used:
+This will try to test and install the "blead" version of the code.  If the
+Perl version does not support the "blead" version, then the running of the
+Makefile.PL will *fail*.  In such a case, one can force the installing of
+the "maint" version of the code by doing:
 
-perl5.8.9-threaded Makefile.PL blead
+ perl Makefile.PL maint
 
-This will force the testing and installing of the 'blead' version of the code.
-Vice-versa, if you want to have the 'maint' version, you can say:
+Alternately, if you want automatic selection behavior, you can set the
+AUTO_SELECT_MAINT_OR_BLEAD environment variable to a true value.  On Unix-like
+systems like so:
 
-perl5.14.2-threaded Makefile.PL maint
+ AUTO_SELECT_MAINT_OR_BLEAD=1 perl Makefile.PL
 
-In either case, your mileage may vary.
+If your perl does not support the "blead" version of the code, then it will
+automatically install the "maint" version of the code.
