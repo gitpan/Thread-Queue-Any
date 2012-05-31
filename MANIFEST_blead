@@ -1,0 +1,13 @@
+MANIFEST
+MANIFEST_maint
+CHANGELOG
+README
+TODO
+Makefile.PL
+lib_maint/Thread/Queue/Any.pm_maint
+lib/Thread/Queue/Any.pm
+t/001basic.t
+t/010serializer.t
+t_maint/Queue-Any.t_maint
+META.yml                                Module meta-data (added by MakeMaker)
+threadsforks                threads/forks test (added by Devel::ThreadsForks)
