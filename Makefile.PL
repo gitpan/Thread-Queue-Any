@@ -1,32 +1,14 @@
 require 5.008;
 
-# do we have threads or forks??
-my $module;
-BEGIN {
-    $module=  "Thread::Queue::Any";
-
-    require Config;
-    Config->import;
-
-    if ( !$Config{useithreads} ) {
-
-        eval { require forks };
-        if ($@) {
-            print <<"TEXT";
-$module requires a version of perl that has threads enabled or
-which has the forks.pm module installed.
-TEXT
-            exit 0;
-        }
-    }
-} #BEGIN
-
-# set up stuff
-use ExtUtils::MakeMaker;
-use File::Copy qw( mv );
+# do we have threads/forks?
+BEGIN { eval "use Devel::ThreadsForks"  || do 'threadsforks' } #BEGIN
 
 # set version and dependency info
+use ExtUtils::MakeMaker;
 eval "use Devel::Required";
+
+# set up stuff
+use File::Copy qw( mv );
 
 # initializations
 my $lib_tree=   'Thread/Queue';
@@ -140,7 +122,7 @@ push @prereq_pm, (
 
 # set up
 WriteMakefile (
- NAME         => $module,
+ NAME         => 'Thread::Queue::Any',
  AUTHOR       => 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT     => 'thread-safe queues for any data-structure',
  VERSION_FROM => 'lib/Thread/Queue/Any.pm',

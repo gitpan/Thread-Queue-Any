@@ -1,3 +1,12 @@
+1.06    31 May 2012
+        Replaced forks/threads checking logic in Makefile.PL by using the
+        new Devel::ThreadsForks module.
+
+        Changed order of files in MANIFEST in the hope that it will show the
+        "blead" version of the module by default in search.cpan.org.
+
+        Changed erroneous "require 5.014" by more appropriate "use 5.014".
+
 1.05    30 May 2012
         After on/offlist discussion on p5p, I decided to not have automatic
         state selection logic.  Instead, it will by default try to install
