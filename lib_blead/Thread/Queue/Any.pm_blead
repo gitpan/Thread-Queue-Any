@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Any 1.06; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any 1.07; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Queue::Any;       # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= 1.06;                   # please remove if no longer needed
+our $VERSION= 1.07;                   # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
@@ -197,7 +197,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.06.
+This documentation describes version 1.07.
 
 =head1 DESCRIPTION
 
@@ -323,6 +323,33 @@ as:
 
  Test::More (0.88)
  Thread::Queue (any)
+
+=head1 INSTALLATION
+
+This distribution contains two versions of the code: one maintenance version
+for versions of perl < 5.014 (known as 'maint'), and the version currently in
+development (known as 'blead').  The standard build for your perl version is:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+This will try to test and install the "blead" version of the code.  If the
+Perl version does not support the "blead" version, then the running of the
+Makefile.PL will *fail*.  In such a case, one can force the installing of
+the "maint" version of the code by doing:
+
+ perl Makefile.PL maint
+
+Alternately, if you want automatic selection behavior, you can set the
+AUTO_SELECT_MAINT_OR_BLEAD environment variable to a true value.  On Unix-like
+systems like so:
+
+ AUTO_SELECT_MAINT_OR_BLEAD=1 perl Makefile.PL
+
+If your perl does not support the "blead" version of the code, then it will
+automatically install the "maint" version of the code.
 
 =head1 AUTHOR
 

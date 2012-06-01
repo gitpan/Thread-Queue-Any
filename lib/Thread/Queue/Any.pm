@@ -2,7 +2,7 @@ package Thread::Queue::Any;
 
 # initializations
 @ISA=     qw( Thread::Queue );
-$VERSION= '0.13';
+$VERSION= '0.14';
 
 # be as strict as possble
 use strict;
@@ -75,7 +75,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 0.13.
+This documentation describes version 0.14.
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ This documentation describes version 0.13.
 
  Please also note that this documentation describes the "maint" version
  of this code.  This version is essentially frozen.  Please use a 5.14
- version of perl for the "blead" version of this code.
+ or higher version of perl for the "blead" version of this code.
 
                     *************************
 

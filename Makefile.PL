@@ -3,19 +3,19 @@ require 5.008;
 # do we have threads/forks?
 BEGIN { eval "use Devel::ThreadsForks"  || do 'threadsforks' } #BEGIN
 
-# set version and dependency info
-use ExtUtils::MakeMaker;
-eval "use Devel::Required";
-
-# set up stuff
-use File::Copy qw( mv );
-
 # initializations
 my $lib_tree=   'Thread/Queue';
 my @postfix=    qw( blead maint );
 my $required=   '5.014';
 my $auto_maint= ( $] < $required ) || 0;
 my $maint=      $ENV{AUTO_SELECT_MAINT_OR_BLEAD} ? $auto_maint : 0;
+
+# set version and dependency info
+use ExtUtils::MakeMaker;
+eval "use Devel::Required maint_blead => $required";
+
+# set up stuff
+use File::Copy qw( mv );
 
 # do we have an override?
 if (@ARGV) {
@@ -33,6 +33,13 @@ if (@ARGV) {
     }
 
     print STDERR "Forcing to use the '$type' version of the code\n";
+}
+
+# first time running Makefile.PL
+elsif ( !-e pm_to_blib ) {
+
+    # maint capable perl only and no maint files in hidden dir, maint is ok
+    $maint=1 if $auto_maint and !glob( "lib_maint/$lib_tree/*" );
 }
 
 # sorry, we can't help you
