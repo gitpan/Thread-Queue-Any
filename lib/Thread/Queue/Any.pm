@@ -4,7 +4,7 @@ package Thread::Queue::Any;       # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= 1.07;                   # please remove if no longer needed
+our $VERSION= 1.08;                   # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
@@ -197,7 +197,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.07.
+This documentation describes version 1.08.
 
 =head1 DESCRIPTION
 
