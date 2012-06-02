@@ -1,3 +1,7 @@
+1.11    2 June 2012
+        Fixed problem in serializer specification.  Found while working on
+        Thread::Queue::Any::Monitored subclass.
+
 1.10    2 June 2012
         Added "THAW" class method for subclasses such as
         Thread::Queue::Any::Monitored.

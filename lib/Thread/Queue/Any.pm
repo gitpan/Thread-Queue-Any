@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Any '1.10; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any '1.11; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Queue::Any;        # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= '1.10';              # please remove if no longer needed
+our $VERSION= '1.11';              # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
@@ -106,7 +106,7 @@ sub import {
         push @errors, "Cannot serialize with '$serializer', already using '$SERIALIZER'"
           if $SERIALIZER and $serializer ne $SERIALIZER;
         push @errors, "Cannot serialize with '$serializer', already using freeze/thaw"
-          if !$SERIALIZER;
+          if !$SERIALIZER and ( $FREEZE or $THAW );;
         push @errors, "Cannot specify 'freeze', already using serializer '$serializer'"
           if $freeze;
         push @errors, "Cannot specify 'thaw', already using serializer '$serializer'"
@@ -152,6 +152,8 @@ sub import {
     else {
         _set_serializer('Storable');
     }
+
+    return;
 } #import
 
 #-------------------------------------------------------------------------------
@@ -212,11 +214,11 @@ Thread::Queue::Any - thread-safe queues for any data-structure
     # thaw hook for subclasses
     package Thread::Queue::Any::Foo;
     @ISA= 'Thread::Queue::Any';
-    my $THAW= Thread::Queue::Any->THAW;
+    my $THAW= __PACKAGE__->THAW;
 
 =head1 VERSION
 
-This documentation describes version 1.10.
+This documentation describes version 1.11.
 
 =head1 DESCRIPTION
 
