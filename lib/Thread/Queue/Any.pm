@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Any 1.09; # not supported by PAUSE or MetaCPAN :-(
-package Thread::Queue::Any;       # please remove if no longer needed
+#package Thread::Queue::Any '1.10; # not supported by PAUSE or MetaCPAN :-(
+package Thread::Queue::Any;        # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= 1.09;                   # please remove if no longer needed
+our $VERSION= '1.10';              # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
@@ -26,6 +26,20 @@ my $THAW;
 # satisfy -require-
 1;
 
+#-------------------------------------------------------------------------------
+#
+# Class methods
+#
+#-------------------------------------------------------------------------------
+#  IN: 1 class (not used)
+# OUT: 1 code ref used for thawing
+
+sub THAW { $THAW } #THAW
+
+#-------------------------------------------------------------------------------
+#
+# Instance methods
+#
 #-------------------------------------------------------------------------------
 #  IN: 1 instantiated object
 #      2..N parameters to be passed as a set onto the queue
@@ -195,9 +209,14 @@ Thread::Queue::Any - thread-safe queues for any data-structure
     # specify custom freeze and thaw subroutines
     use Thread::Queue::Any freeze => \&solid, thaw => \&liquid;
 
+    # thaw hook for subclasses
+    package Thread::Queue::Any::Foo;
+    @ISA= 'Thread::Queue::Any';
+    my $THAW= Thread::Queue::Any->THAW;
+
 =head1 VERSION
 
-This documentation describes version 1.09.
+This documentation describes version 1.10.
 
 =head1 DESCRIPTION
 
@@ -228,6 +247,13 @@ remove elements from the head of the list.
  $queue= Thread::Queue::Any->new;
 
 The C<new> function creates a new empty queue.
+
+=head2 THAW
+
+ $THAW= $subclass->THAW;
+
+Return the code reference for de-serializing enqueued data.  Intended to be
+used by subclasses only, such as L<Thread::Queue::Any::Monitored>.
 
 =head1 OBJECT METHODS
 

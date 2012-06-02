@@ -32,6 +32,7 @@ can_ok( $q, qw(
  enqueue
  new
  pending
+ THAW
 ) );
 
 # enqueing

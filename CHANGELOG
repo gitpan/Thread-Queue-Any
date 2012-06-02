@@ -1,3 +1,7 @@
+1.10    2 June 2012
+        Added "THAW" class method for subclasses such as
+        Thread::Queue::Any::Monitored.
+
 1.09    2 June 2012
         Updated "maintblead" to Devel::MaintBlead 0.02.  This should fix the
         problem that if an inappropriate Perl version was seen, the Makefile.PL
