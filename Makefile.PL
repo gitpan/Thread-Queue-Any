@@ -1,7 +1,7 @@
 require 5.008;
 
 # do we have threads/forks?
-BEGIN { eval "use Devel::ThreadsForks"  || do 'threadsforks' } #BEGIN
+BEGIN { eval "use Devel::ThreadsForks; 1" || do 'threadsforks' } #BEGIN
 
 # make sure we have the right code path
 $LIB_TREE= 'Thread/Queue';
