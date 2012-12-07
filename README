@@ -15,10 +15,9 @@ All rights reserved.  This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 Version:
- 1.12
+ 0.16
 
 Required Modules:
- Test::More (0.88)
  Thread::Queue (any)
 
 Installation:
@@ -46,5 +45,8 @@ systems like so:
 
 If your perl does not support the "blead" version of the code, then it will
 automatically install the "maint" version of the code.
+
+Please note that any additional parameters will simply be passed on to the
+underlying Makefile.PL processing.
 
 
