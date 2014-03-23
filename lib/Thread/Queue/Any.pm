@@ -1,16 +1,19 @@
 use 5.014;
-#package Thread::Queue::Any '1.13'; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any '1.14'; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Queue::Any;         # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= '1.13';               # please remove if no longer needed
+our $VERSION= '1.14';               # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
 
 # modules that we need
 use Thread::Queue (); # no need to pollute namespace
+BEGIN {
+    *ISHASH = sub () { $Thread::Queue::VERSION >= 3 }
+}
 
 # synonym for dequeue_dontwait
 {
@@ -76,9 +79,9 @@ sub dequeue_dontwait {
 sub dequeue_keep {
 
     # make sure we're the only one
-    lock( @{ $_[0] } );
+    lock( ISHASH ? $_[0] : @{ $_[0] } );
 
-    my $ref= shift->[0] or return;
+    my $ref= ( ISHASH ? shift->{queue}->[0] : shift->[0] ) or return;
     return wantarray
       ? @{ $THAW->($ref) }
       : $THAW->($ref)->[0];
@@ -220,7 +223,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.13.
+This documentation describes version 1.14.
 
 =head1 DESCRIPTION
 
